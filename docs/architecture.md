@@ -22,7 +22,6 @@ graph TD
     P --> L[WebLLM (MLC, WebGPU): Llama-3.2-1B-Instruct]
     L --> U[Answer + Citations UI: [C#] links scroll/highlight chunk]
   end
-```
 
 ---
 
@@ -89,5 +88,6 @@ graph TD
 - Multi-doc library with tags and filters
 - Answer styles (ELI5 / executive summary)
 - Export conversation + citations to Markdown
+
 
 
