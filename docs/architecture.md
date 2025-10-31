@@ -6,62 +6,39 @@ This app implements Retrieval-Augmented Generation entirely **in the browser**. 
 
 ## Block Diagram
 
-[User PDF Upload]
-|
-v
-pdf.js
-(extract text per page)
-|
-v
-Sliding Chunker
-(~900 chars, 150 overlap)
-keep: page, charStart, charEnd
-|
-v
-Transformers.js (MiniLM)
-(feature-extraction, mean pooling,
-normalized)
-|
-v
-IndexedDB (localForage)
-├─ docs: [{ docId, fileName, createdAt }]
-└─ doc:${docId}:vectors:
-{
-dims,
-chunks: [{ id, text, page, charStart, charEnd }],
-vectors: [{ id, page, charStart, charEnd, vector: Float[] }]
-}
-^
-|
-Retrieval (Cosine Similarity)
+```mermaid
+graph TD
+  A[User PDF Upload] --> B[pdf.js<br/>Extract text per page]
+  B --> C[Sliding Chunker<br/>~900 chars, 150 overlap<br/>keep page/charStart/charEnd]
+  C --> D[Transformers.js (MiniLM)<br/>feature-extraction, mean pooling, normalized]
+  D --> E[IndexedDB via localForage<br/>docs list + doc:{docId}:vectors {chunks, vectors, dims}]
 
-embed(question)
+  subgraph Retrieval & Answering
+    Q[User Question] --> Qe[Embed Question (MiniLM)]
+    Qe --> S[Cosine Similarity over Stored Vectors]
+    E --> S
+    S --> K[Top-k Selection (3–8)]
+    K --> P[Prompt Builder<br/>Strict or Normal<br/>Quoted chunks with [C#]<br/>Guardrail: MIN_SIM threshold]
+    P --> L[WebLLM (MLC, WebGPU)<br/>Llama-3.2-1B-Instruct<br/>temp=0 (strict) / 0.1 (normal)]
+    L --> U[Answer + Citations UI<br/>[C#] links scroll/highlight chunk]
+  end
 
-rank vectors
+> if mermaid doesn’t render immediately, click the **“Preview”** tab at the top of the file — it should show a nice flowchart.
 
-top-k selection (k = 3–8)
-|
-v
-Prompt Builder
+### optional (keep an ASCII fallback at the end)
 
-strict or normal mode
+If you want a text fallback for places that don’t support Mermaid, add this after the diagram:
 
-quoted chunks with [C#]
+```markdown
+<details>
+<summary>ASCII fallback</summary>
 
-guardrail: MIN_SIM threshold
-|
-v
-WebLLM (MLC, WebGPU)
+Upload → pdf.js → Chunker → Embeddings → IndexedDB
+↑ ↓
+Question → Embed → Cosine Sim → Top-k → Prompt → WebLLM → Answer + [C#]
 
-local instruction model
 
-temperature: 0 (strict) / 0.1 (normal)
-|
-v
-Answer + Citations UI
-
-[C#] → clickable anchor → scroll/highlight chunk
-
+</details>
 
 ---
 
@@ -128,3 +105,4 @@ Answer + Citations UI
 - Multi-doc library with tags and filters
 - Answer styles (ELI5 / executive summary)
 - Export conversation + citations to Markdown
+
