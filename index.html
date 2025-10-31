@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Private Doc Chat — On-Device RAG (MVP)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <h1>Private Doc Chat — On-Device RAG</h1>
+    <div class="badge">100% Client-Side</div>
+  </header>
+
+  <main class="container" id="app-root" aria-busy="false">
+    <!-- Controls -->
+    <section class="panel controls" aria-label="Controls">
+      <div class="control-row">
+        <label class="file-button" for="pdf-input" tabindex="0" aria-label="Upload PDF">
+          📄 Upload PDF
+        </label>
+        <input id="pdf-input" type="file" accept="application/pdf" />
+        <button id="clear-data" class="danger" aria-label="Clear local data">🧹 Clear Data</button>
+      </div>
+
+      <div class="control-row wrap">
+  <label for="topk">Top-k</label>
+  <select id="topk" aria-label="Top-k retrieved chunks">
+    <option>3</option>
+    <option>4</option>
+    <option>5</option>
+    <option selected>6</option>
+    <option>7</option>
+    <option>8</option>
+  </select>
+
+  <label for="maxTokens">Max answer length</label>
+  <input id="maxTokens" type="range" min="64" max="512" step="32" value="256" />
+  <span id="maxTokensValue" aria-live="polite">256</span>
+
+  <!-- NEW: Strict mode -->
+  <label for="strictMode" style="display:inline-flex;align-items:center;gap:6px">
+    <input id="strictMode" type="checkbox" />
+    Strict (quote-only)
+  </label>
+
+  <label for="question" class="sr-only">Ask a question</label>
+  <input id="question" class="ask" type="text" placeholder="Ask a question about your PDF..." />
+  <button id="ask" class="primary" disabled aria-disabled="true">Ask</button>
+</div>
+
+    </section>
+
+    <!-- Status / model loading -->
+    <section class="panel status" aria-live="polite" aria-atomic="true">
+      <div><strong>WebGPU:</strong> <span id="webgpu-status">Checking…</span></div>
+      <div><strong>Transformers.js:</strong> <span id="xenova-status">Loading…</span></div>
+      <div><strong>PDF.js:</strong> <span id="pdfjs-status">Loading…</span></div>
+      <div><strong>localForage:</strong> <span id="lf-status">Loading…</span></div>
+
+      <div class="model-load">
+        <button id="load-model" class="secondary">⬇️ Load Tiny Model</button>
+        <div id="model-progress-wrap" class="progress-wrap hidden" aria-hidden="true">
+          <div id="model-progress" class="progress-bar" style="width:0%"></div>
+        </div>
+        <div id="model-status" class="muted">Model not loaded</div>
+      </div>
+    </section>
+
+    <!-- Answer -->
+    <section class="panel" aria-label="Answer">
+      <h2>Answer</h2>
+      <div id="answer" class="answer"></div>
+    </section>
+
+    <!-- Sources -->
+    <section class="panel" aria-label="Sources">
+      <h2>Sources</h2>
+      <div id="sources" class="sources"></div>
+    </section>
+
+    <!-- Ingest log -->
+    <section class="panel" aria-label="Ingest Log">
+      <h2>Ingest</h2>
+      <div id="ingest-log" class="log"></div>
+    </section>
+  </main>
+
+  <!-- Busy overlay (shown during long tasks) -->
+  <div id="busy-overlay" class="busy hidden" aria-hidden="true" aria-label="Working">
+    <div class="spinner" role="status" aria-live="assertive" aria-label="Loading"></div>
+    <div class="busy-text">Working…</div>
+  </div>
+
+  <footer class="app-footer">
+    <span>Privacy: All compute stays in your browser. Use “Clear Data” any time.</span>
+  </footer>
+
+  <!-- localForage (IndexedDB helper) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Our app (ES module) -->
+  <script type="module" src="./app.js"></script>
+
+  <!-- Register offline Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
