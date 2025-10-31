@@ -5,53 +5,31 @@ This app implements Retrieval-Augmented Generation entirely **in the browser**. 
 ---
 
 ## Block Diagram
+
 ```mermaid
 graph TD
-  A[User PDF Upload] --> B[pdf.js: extract text per page]
-  B --> C[Sliding Chunker: ~900 chars, 150 overlap; keep page/char ranges]
-  C --> D[Transformers.js (MiniLM): mean pooling, normalized]
-  D --> E[IndexedDB (localForage): docs list + doc:{id}: {chunks, vectors, dims}]
+  A[User PDF Upload] --> B[pdf.js extract text per page]
+  B --> C[Sliding Chunker ~900 chars 150 overlap keep page and char ranges]
+  C --> D[Transformers.js MiniLM mean pooling normalized]
+  D --> E[IndexedDB via localForage docs list and per doc vectors]
 
   subgraph Retrieval_And_Answering
-    Q[User Question] --> Qe[Embed Question (MiniLM)]
-    Qe --> S[Cosine Similarity over stored vectors]
+    Q[User Question] --> Qe[Embed question]
+    Qe --> S[Cosine similarity over stored vectors]
     E --> S
-    S --> K[Top-k selection (3–8)]
-    K --> P[Prompt Builder: Strict or Normal; add [C#]; MIN_SIM guardrail]
-    P --> L[WebLLM (MLC, WebGPU): Llama-3.2-1B-Instruct]
-    L --> U[Answer + Citations UI: [C#] links scroll/highlight chunk]
+    S --> K[Top k selection 3 to 8]
+    K --> P[Prompt builder strict or normal add citations and min sim guardrail]
+    P --> L[WebLLM MLC WebGPU Llama 3 dot 2 1B Instruct]
+    L --> U[Answer with citations UI links scroll and highlight chunk]
   end
 <details> <summary><strong>ASCII fallback (click to expand)</strong></summary>
-User PDF Upload
-      |
-      v
-pdf.js  (extract text per page)
-      |
-      v
-Sliding Chunker (~900 chars, 150 overlap; keep page/char ranges)
-      |
-      v
-Transformers.js (MiniLM)  -- mean pooling, normalized
-      |
-      v
-IndexedDB (localForage): docs list + doc:{id} {chunks, vectors, dims}
-
-               ^                         |
-               |                         |
-User Question  |                         |
-     v         |                         |
-Embed Question (MiniLM)                  |
-     v                                   
-Cosine Similarity over stored vectors <--- 
-     v
-Top-k selection (3–8)
-     v
-Prompt Builder (Strict/Normal; add [C#]; MIN_SIM guardrail)
-     v
-WebLLM (MLC, WebGPU): Llama-3.2-1B-Instruct
-     v
-Answer + Citations UI ([C#] links scroll/highlight chunk)
-</details>
+rust
+Copy code
+Upload -> pdf.js -> Chunker -> Embeddings -> IndexedDB
+                                   ^               |
+                                   |               |
+Question -> Embed -> Cosine Sim -> Top-k -> Prompt -> WebLLM -> Answer (+ citations)
+</details> 
 ```
 
 ---
@@ -119,6 +97,7 @@ Answer + Citations UI ([C#] links scroll/highlight chunk)
 - Multi-doc library with tags and filters
 - Answer styles (ELI5 / executive summary)
 - Export conversation + citations to Markdown
+
 
 
 
