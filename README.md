@@ -1,5 +1,7 @@
 # Private Doc Chat — 100% Browser-Only RAG
 
+[![Open Live Demo](https://img.shields.io/badge/Open-Live%20Demo-2ea44f)](https://pranjalmax.github.io/private-doc-chat/)
+
 A lightweight, privacy-first PDF Q&A app. Drop a document, ask questions, and get grounded answers with inline citations — all **on-device**, with **no servers** and **no API keys**.
 
 > **Key idea:** Retrieval-Augmented Generation (RAG) implemented fully in the browser using WebGPU and WebAssembly. The model and embeddings run locally; your files never leave your machine.
@@ -134,3 +136,4 @@ See `docs/architecture.md` for a diagram and data flow.
 ## License
 
 MIT — use freely, no warranty.
+
