@@ -1,0 +1,50 @@
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Editors/IDEs ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# --- Build/dep caches (in case you add a build later) ---
+node_modules/
+bower_components/
+dist/
+build/
+out/
+.cache/
+.tmp/
+.temp/
+coverage/
+.eslintcache
+parcel-cache/
+.vite/
+.next/
+.nuxt/
+.svelte-kit/
+.vercel/
+
+# --- Env/secrets (should never be in this project anyway) ---
+.env
+.env.*
+*.pem
+*.key
+
+# --- Misc ---
+*.swp
+*.swo
+*.tar
+*.gz
+*.zip
+
+# --- Optional: if you ever download models locally, keep them out of git ---
+models/
