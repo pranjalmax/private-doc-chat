@@ -5,7 +5,6 @@ This app implements Retrieval-Augmented Generation entirely **in the browser**. 
 ---
 
 ## Block Diagram
-
 ```mermaid
 graph TD
   A[User PDF Upload] --> B[pdf.js: extract text per page]
@@ -22,6 +21,38 @@ graph TD
     P --> L[WebLLM (MLC, WebGPU): Llama-3.2-1B-Instruct]
     L --> U[Answer + Citations UI: [C#] links scroll/highlight chunk]
   end
+<details> <summary><strong>ASCII fallback (click to expand)</strong></summary>
+User PDF Upload
+      |
+      v
+pdf.js  (extract text per page)
+      |
+      v
+Sliding Chunker (~900 chars, 150 overlap; keep page/char ranges)
+      |
+      v
+Transformers.js (MiniLM)  -- mean pooling, normalized
+      |
+      v
+IndexedDB (localForage): docs list + doc:{id} {chunks, vectors, dims}
+
+               ^                         |
+               |                         |
+User Question  |                         |
+     v         |                         |
+Embed Question (MiniLM)                  |
+     v                                   
+Cosine Similarity over stored vectors <--- 
+     v
+Top-k selection (3–8)
+     v
+Prompt Builder (Strict/Normal; add [C#]; MIN_SIM guardrail)
+     v
+WebLLM (MLC, WebGPU): Llama-3.2-1B-Instruct
+     v
+Answer + Citations UI ([C#] links scroll/highlight chunk)
+</details>
+```
 
 ---
 
@@ -88,6 +119,7 @@ graph TD
 - Multi-doc library with tags and filters
 - Answer styles (ELI5 / executive summary)
 - Export conversation + citations to Markdown
+
 
 
 
